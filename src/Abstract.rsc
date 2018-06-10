@@ -1,29 +1,40 @@
 module Abstract
 
-public data TYPE = natural() | string() | boolean();    
+public data TYPE = Int() | string() | boolean() | float() | Matrix() | Vector2d() | Vector3d();    
 	  
-public alias PicoId = str;                  
+public alias JGId = str;                  
 	  
 public data PROGRAM =                       
   program(list[DECL] decls, list[STATEMENT] stats);
 
 public data DECL =
-  decl(PicoId name, TYPE tp);
+  decl(JGId name, TYPE tp);
 
 public data EXP = 
-       id(PicoId name)
-     | natCon(int iVal)
+       id(JGId name)
+     | IntCon(int iVal)
      | strCon(str sVal)
-     | bolCon(bool bVal)
+     | bolCon(boolean() bVal)
+     | floCon(float fVal)
+     //| MatCon(Matrix mVal)
+     //| V2Con(Vector2d v2Val)
+     //| V3Con(Vector3d v3Val)
+     | notCon(EXP bVal)
+     | invCon(EXP mVal)
+     | tranCon(EXP mVal)
+     | dot(EXP left, EXP right)
+     | mul(EXP left, EXP right)
+     | div(EXP left, EXP right)
      | add(EXP left, EXP right)
      | sub(EXP left, EXP right)
      | conc(EXP left, EXP right)
      ;
     
 public data STATEMENT =
-       asgStat(PicoId name, EXP exp)
+       asgStat(JGId name, EXP exp)
      | ifElseStat(EXP exp, list[STATEMENT] thenpart, list[STATEMENT] elsepart)
      | whileStat(EXP exp, list[STATEMENT] body)
+     | forStat(JGId name, EXP exp, list[STATEMENT] forbody)
      ;
 
 anno loc TYPE@location;                   

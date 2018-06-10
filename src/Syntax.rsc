@@ -8,17 +8,19 @@ lexical Int = [0-9]+
             
 lexical String = "\"" ![\"]*  "\"";
 
-lexical Float = [0-9]+ "." [0-9]+ 
-              | "-"[0-9]+ "." [0-9]+;
+lexical Float = [1-9][0-9]+ "." [0-9]+ 
+              | "-"[1-9][0-9]+ "." [0-9]+
+              | [0-9] "." [0-9]+
+              | "-"[0-9] "." [0-9]+;
 
 lexical Boolean = [a-zA-Z0-9] !<< "TRUE" !>> [a-zA-Z0-9]
                 | [a-zA-Z0-9] !<< "FALSE" !>> [a-zA-Z0-9];
                 
-lexical Matrix = ([a-z][a-z0-9]* !>> [a-z0-9]) \ JGKeywords;
+lexical Matrix = ("["Float (","Float)* "]")+;
 
-lexical Vector2d = ([a-z][a-z0-9]* !>> [a-z0-9]) \ JGKeywords;
+lexical Vector2d = "["Float "," Float "]";
 
-lexical Vector3d = ([a-z][a-z0-9]* !>> [a-z0-9]) \ JGKeywords;
+lexical Vector3d = "["Float "," Float "," Float"]";
 
 keyword JGKeywords = "begin" | "end" | 
                        "declare" | 
@@ -45,9 +47,12 @@ syntax Declaration = decl: Type tp ":" Id id;
 
 syntax Type 
    = Int:"int" 
-   | string:"string" 
-   | boolean:"boolean"
-   | float:"float"
+   | String:"string" 
+   | Boolean:"boolean"
+   | Float:"float"
+   | Matrix:"Matrix"
+   | Vector2d:"Vector2d"
+   | Vector3d:"Vector3d"
    ;
 
 syntax Statement 
@@ -68,12 +73,18 @@ syntax Expression
    | floatCon: Float float
    | bracket "(" Expression e ")"
    > not: "not" Expression rhs
+   > invers: "inv" Expression rhs
+   | transpose: "tran" Expression rhs 
+   > left dot: Expression lhs "dot" Expression rhs
    > left (coma: Expression lhs "==" Expression rhs
           | comb: Expression lhs "!=" Expression rhs)
    > left ( ands: Expression lhs "&&"  Expression rhs
           | andc: Expression lhs "and"  Expression rhs
           | ors: Expression lhs "||" Expression rhs
           | orc: Expression lhs "or" Expression rhs
+          )
+   > left ( mul: Expression lhs "*" Expression rhs
+          | div: Expression lhs "/" Expression rhs
           )
    > left ( add: Expression lhs "+" Expression rhs
           | sub: Expression lhs "-" Expression rhs
