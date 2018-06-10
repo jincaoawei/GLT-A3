@@ -1,6 +1,8 @@
 module Abstract
 
-public data TYPE = Int() | string() | boolean() | float() | Matrix() | Vector2d() | Vector3d();    
+import Syntax;
+
+public data TYPE = Int() | String() | Boolean() | Float() | Matrix() | Vector2d() | Vector3d();    
 	  
 public alias JGId = str;                  
 	  
@@ -13,16 +15,22 @@ public data DECL =
 public data EXP = 
        id(JGId name)
      | IntCon(int iVal)
-     | strCon(str sVal)
-     | bolCon(boolean() bVal)
-     | floCon(float fVal)
-     //| MatCon(Matrix mVal)
-     //| V2Con(Vector2d v2Val)
-     //| V3Con(Vector3d v3Val)
+     | StrCon(str sVal)
+     | BolCon(boolean bVal)
+     | FloCon(float fVal)
+     | MatCon(Matrix mVal)
+     | V2Con(Vector2d v2Val)
+     | V3Con(Vector3d v3Val)
      | notCon(EXP bVal)
      | invCon(EXP mVal)
      | tranCon(EXP mVal)
      | dot(EXP left, EXP right)
+     | coma(EXP left, EXP right)
+     | comb(EXP left, EXP right)
+     | ands(EXP left, EXP right)
+     | ors(EXP left, EXP right)
+     | andc(EXP left, EXP right)
+     | orc(EXP left, EXP right)
      | mul(EXP left, EXP right)
      | div(EXP left, EXP right)
      | add(EXP left, EXP right)
@@ -43,4 +51,4 @@ anno loc DECL@location;
 anno loc EXP@location;
 anno loc STATEMENT@location;
 
-public alias Occurrence = tuple[loc location, PicoId name, STATEMENT stat];
+public alias Occurrence = tuple[loc location, JGId name, STATEMENT stat];

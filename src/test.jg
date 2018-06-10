@@ -1,11 +1,5 @@
 begin
   declare
      int: a, string: b, float: c, boolean: d, Matrix: x, Vector2d: m, Vector3d: n;
-     a := -1;
-     b := "a";
-     c := 0.2;
-     m := [-0.2,0.2];
-     d := TRUE;
-     a := inv b;
-     x := [0.2,0.5,0.1,-0.3][0.1,-0.2];
+     a := 1;
 end
