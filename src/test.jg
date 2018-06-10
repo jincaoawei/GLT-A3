@@ -1,0 +1,9 @@
+begin
+  declare
+     int: a, string: b, float: c, boolean: d;
+     a := 1;
+     b := "a";
+     c := 0x0.2;
+     d := TRUEa;
+     d := "a";
+end
