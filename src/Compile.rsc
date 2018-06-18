@@ -4,25 +4,21 @@ import Prelude;
 import Abstract;
 import Load;
 import ToJava;
+import StringTemplate;
 
 alias Instrs = list[Instr];                       
 
 // Compile Expressions.
 
-Instrs compileExp(natCon(int N)) = [pushNat(N)];  
+str compileExp(natCon(int N)) = "<N>";  
 
-Instrs compileExp(strCon(str S)) = [pushStr(substring(S,1,size(S)-1))];
+str compileExp(strCon(str S)) = S;
 
-Instrs compileExp(id(PicoId Id)) = [rvalue(Id)];
+str compileExp(id(JGId Id)) = "<Id>";
 
 public Instrs compileExp(add(EXP E1, EXP E2)) =    
   [*compileExp(E1), *compileExp(E2), add2()];
 
-Instrs compileExp(sub(EXP E1, EXP E2)) =
-  [*compileExp(E1), *compileExp(E2), sub2()];
-
-Instrs compileExp(conc(EXP E1, EXP E2)) =
-  [*compileExp(E1), *compileExp(E2), conc2()];
   
 // Unique label generation
 
@@ -35,22 +31,16 @@ private str nextLabel() {
 
 // Compile a statement
 
-Instrs compileStat(asgStat(PicoId Id, EXP Exp)) =
-	[lvalue(Id), *compileExp(Exp), assign()];
+str compileStat(asgStat(JGId Id, EXP Exp)) =
+	compileExp(Id)+ "=" + compileExp(Exp);
 	
-Instrs compileStat(ifElseStat(EXP Exp,              
+str compileStat(ifElseStat(EXP Exp,              
                               list[STATEMENT] Stats1,
                               list[STATEMENT] Stats2)){
   
   elseLab = nextLabel();
   endLab = nextLabel();  
-  return [*compileExp(Exp), 
-          gofalse(elseLab), 
-          *compileStats(Stats1),  
-          go(endLab), 
-          label(elseLab), 
-          *compileStats(Stats2), 
-          label(endLab)];
+  return "if ("+ Exp +") {"+ Stats1+"} else{"+Stats2+"}";
 }
 
 Instrs compileStat(whileStat(EXP Exp, 
@@ -66,24 +56,38 @@ Instrs compileStat(whileStat(EXP Exp,
 }
 
 // Compile a list of statements
-Instrs compileStats(list[STATEMENT] Stats1) =      
-  [ *compileStat(S) | S <- Stats1 ];
+str compileStats(list[STATEMENT] Stats1) {
+	str result = "" ;
+	  for(s<-Stats1){
+	  	result+="<s>";
+	  };
+	  return result;
+}   
+	
   
 // Compile declarations
 
 Instrs compileDecls(list[DECL] Decls) =
-  [ ((tp == natural()) ? dclNat(Id) : dclStr(Id))  |       
-    decl(PicoId Id, TYPE tp) <- Decls
+  [ ((tp == dec()) ? Double (Id) : String (Id))  |       
+    decl(JGId Id, TYPE tp) <- Decls
   ];
 
 // Compile a JG program
 
-public Instrs compileProgram(PROGRAM P){
+public str compileProgram(PROGRAM P){
   nLabel = 0;
   if(program(list[DECL] Decls, list[STATEMENT] Series) := P){
-     return [*compileDecls(Decls), *compileStats(Series)];
+  return
+    "public class test {
+    '  <for (x <- sort([f | f <- compileDecls(Decls)])) {>
+    '  private <x>;
+       public void main(){
+       	<compileStats(Series)>
+       }
+  <}>
+    '}";
   } else
     throw "Cannot happen";
 }
 
-public Instrs compileProgram(str txt) = compileProgram(load(txt));
+public str compileProgram(str txt) = compileProgram(load(txt));
