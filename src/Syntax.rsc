@@ -3,24 +3,22 @@ module Syntax
 import Prelude;
 
 lexical Id  = ([a-z][a-z0-9]* !>> [a-z0-9]) \ JGKeywords;
-lexical Int = [0-9]+ 
-            | "-" [0-9]+ ;
+lexical Dec = [0-9]+
+            | "-" [0-9]+;
             
 lexical String = "\"" ![\"]*  "\"";
 
-lexical Float = [1-9][0-9]+ "." [0-9]+ 
-              | "-"[1-9][0-9]+ "." [0-9]+
-              | [0-9] "." [0-9]+
-              | "-"[0-9] "." [0-9]+;
+lexical Float = [1-9]*[0-9] "." [0-9]+ 
+              | "-"[1-9]*[0-9] "." [0-9]+;
 
-lexical Boolean = [a-zA-Z0-9] !<< "TRUE" !>> [a-zA-Z0-9]
-                | [a-zA-Z0-9] !<< "FALSE" !>> [a-zA-Z0-9];
+lexical Boolean = [a-zA-Z0-9] !<< "true" !>> [a-zA-Z0-9]
+                | [a-zA-Z0-9] !<< "false" !>> [a-zA-Z0-9];
                 
-lexical Matrix = ("["Float (","Float)* "]")+;
+lexical Veca = veca:"["Float","Float"]";
 
-lexical Vector2d = "["Float "," Float "]";
-
-lexical Vector3d = "["Float "," Float "," Float"]";
+lexical Vecb = vecb:"["Float", "Float", "Float"]";
+                
+lexical Matrix = matrix:"["("["Float(","Float)+"]")+"]";
 
 keyword JGKeywords = "begin" | "end" | 
                        "declare" | 
@@ -42,17 +40,17 @@ start syntax Program
 syntax Declarations 
    = "declare" {Declaration ","}* decls ";" ;  
  
-syntax Declaration = decl: Type tp ":" Id id;
+syntax Declaration = decl: Id id ":" Type tp;
 
 
 syntax Type 
-   = Int:"int" 
-   | String:"string" 
-   | Boolean:"boolean"
-   | Float:"float"
-   | Matrix:"Matrix"
-   | Vector2d:"Vector2d"
-   | Vector3d:"Vector3d"
+   = dec:"dec"
+   | string:"string" 
+   | boolean:"boolean"
+   | float:"float"
+   | veca:"Vec2d"
+   | vecb:"Vec3d"
+   | matrix:"Matrix"
    ;
 
 syntax Statement 
@@ -64,18 +62,17 @@ syntax Statement
      
 syntax Expression 
    = id: Id name
-   | matrix: Matrix name
-   | vector2d: Vector2d v2
-   | vector3d: Vector3d v3 
    | strCon: String string
-   | intCon: Int int
+   | decCon: Dec dec
    | bolCon: Boolean bool
    | floatCon: Float float
+   | vecaCon: Veca va
+   | vecbCon: Vecb vb
+   | matrixCon: Matrix name 
    | bracket "(" Expression e ")"
    > not: "not" Expression rhs
-   > invers: "inv" Expression rhs
-   | transpose: "tran" Expression rhs 
-   > left dot: Expression lhs "dot" Expression rhs
+   | invers: "invers" Expression rhs
+   | transpose: "trans" Expression rhs
    > left (coma: Expression lhs "==" Expression rhs
           | comb: Expression lhs "!=" Expression rhs)
    > left ( ands: Expression lhs "&&"  Expression rhs

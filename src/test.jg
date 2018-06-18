@@ -1,5 +1,5 @@
-begin
-  declare
-     int: a, string: b, float: c, boolean: d, Matrix: x, Vector2d: m, Vector3d: n;
-     a := 1;
+begin declare a:dec, b:Matrix, c:Vec2d, d:Vec3d, e:float, f:string, e:boolean;
+     a:="a";
+     a:=1; 
+     f:="b"
 end

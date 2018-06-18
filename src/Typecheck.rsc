@@ -19,57 +19,57 @@ TENV checkExp(exp:id(JGId Id), TYPE req, TENV env) {
   return req == tpid ? env : addError(env, exp@location, required(req, tpid));
 }
 
-TENV checkExp(exp:IntCon(int N), TYPE req, TENV env) =                              
-  req == Int() ? env : addError(env, exp@location, required(req, "int"));
+TENV checkExp(exp:decCon(Dec N), TYPE req, TENV env) =                              
+  req == dec() ? env : addError(env, exp@location, required(req, "int"));
 
-TENV checkExp(exp:StrCon(str S), TYPE req, TENV env) =
- req == String() ? env : addError(env, exp@location, required(req, "string"));
+TENV checkExp(exp:strCon(str S), TYPE req, TENV env) =
+ req == string() ? env : addError(env, exp@location, required(req, "string"));
  
 //add: type check for boolean 
-TENV checkExp(exp:BolCon(boolean B), TYPE req, TENV env) =                             
-  req == Boolean() ? env : addError(env, exp@location, required(req, "boolean"));
+TENV checkExp(exp:bolCon(bool B), TYPE req, TENV env) =                             
+  req == boolean() ? env : addError(env, exp@location, required(req, "boolean"));
   
 //add: type check for float 
-TENV checkExp(exp:FloCon(float F), TYPE req, TENV env) =
- req == Float() ? env : addError(env, exp@location, required(req, "float"));
+TENV checkExp(exp:floatCon(Float F), TYPE req, TENV env) =
+ req == float() ? env : addError(env, exp@location, required(req, "float"));
  
 //add: type check for matrix 
-TENV checkExp(exp:MatCon(Matrix M), TYPE req, TENV env) =
- req == Matrix() ? env : addError(env, exp@location, required(req, "matrix"));
+TENV checkExp(exp:matrixCon(Matrix M), TYPE req, TENV env) =
+ req == matrix() ? env : addError(env, exp@location, required(req, "Matrix"));
  
 //add: type check for vector2d 
-TENV checkExp(exp:V2Con(Vector2d V), TYPE req, TENV env) =
- req == Vector2d() ? env : addError(env, exp@location, required(req, "Vector2d"));
+TENV checkExp(exp:vecaCon(Veca V), TYPE req, TENV env) =
+ req == veca() ? env : addError(env, exp@location, required(req, "Vec2d"));
  
 //add: type check for vector3d
-TENV checkExp(exp:V3Con(Vector3d K), TYPE req, TENV env) =
- req == Vector3d() ? env : addError(env, exp@location, required(req, "Vector3d"));
+TENV checkExp(exp:vecbCon(Vecb K), TYPE req, TENV env) =
+ req == vecb() ? env : addError(env, exp@location, required(req, "Vector3d"));
 
 
 //make sure after not the exp is in type boolean
 TENV checkExp(exp:not(EXP B), TYPE req, TENV env) =                              
-  req == Boolean() ? checkExp(B, Boolean(), env)
+  req == boolean() ? checkExp(B, boolean(), env)
                     : addError(env, exp@location, required(req, "boolean"));
                     
 //add: type check of inverse/transpose/dot
-TENV checkExp(exp:inv(EXP M), TYPE req, TENV env) =                              
-  req == Matrix() ? checkExp(B, Matrix(), env)
+TENV checkExp(exp:invers(EXP M), TYPE req, TENV env) =                              
+  req == matrix() ? checkExp(M, matrix(), env)
                     : addError(env, exp@location, required(req, "Matrix"));
                     
-TENV checkExp(exp:tran(EXP M), TYPE req, TENV env) =                              
-  req == Matrix() ? checkExp(B, Matrix(), env)
+TENV checkExp(exp:transpose(EXP T), TYPE req, TENV env) =                              
+  req == matrix() ? checkExp(T, matrix(), env)
                     : addError(env, exp@location, required(req, "Matrix"));                           
 
 TENV checkExp(exp:dot(EXP E1, EXP E2), TYPE req, TENV env){
-   if (req == Float()) {
-        if (checkExp(E1, Vector2d(), env) == checkExp(E2, Vector2d(), env)){
-            return checkExp(E1, Vector2d(), checkExp(E2, Vector2d(), env));
+   if (req == float()) {
+        if (checkExp(E1, veca(), env) == checkExp(E2, veca(), env)){
+            return checkExp(E1, veca(), checkExp(E2, veca(), env));
         }
-        else if (checkExp(E1, Vector3d(), env) == checkExp(E2, Vector3d(), env)){
-            return checkExp(E1, Vector3d(), checkExp(E2, Vector3d(), env));
+        else if (checkExp(E1, vecb(), env) == checkExp(E2, vecb(), env)){
+            return checkExp(E1, vecb(), checkExp(E2, vecb(), env));
         }
         else{
-            return addError(env, exp@location, required("same type(Vector2d/Vector3d)", "different types"));
+            return addError(env, exp@location, required("same type(Vec2d/Vec3d)", "different types"));
         }
     }
     else {
@@ -77,37 +77,39 @@ TENV checkExp(exp:dot(EXP E1, EXP E2), TYPE req, TENV env){
     }
 
 }
-//add: logical operator check for and/or(output type is bool);
-//make sure both sides of exp should be in boolean type
+
+//add: logical operator check for and/or(output type is bool);make sure both sides of exp should be in boolean type
 TENV checkExp(exp:ands(EXP E1, EXP E2), TYPE req, TENV env) =                        
-  req == Boolean() ? checkExp(E1, Boolean(), checkExp(E2, Boolean(), env))
-                   : addError(env, exp@location, required(req, "boolean"));
-                   
-TENV checkExp(exp:ors(EXP E1, EXP E2), TYPE req, TENV env) =                        
-  req == Boolean() ? checkExp(E1, Boolean(), checkExp(E2, Boolean(), env))
+  req == boolean() ? checkExp(E1, boolean(), checkExp(E2, boolean(), env))
                    : addError(env, exp@location, required(req, "boolean"));
                    
 TENV checkExp(exp:andc(EXP E1, EXP E2), TYPE req, TENV env) =                        
-  req == Boolean() ? checkExp(E1, Boolean(), checkExp(E2, Boolean(), env))
+  req == boolean() ? checkExp(E1, boolean(), checkExp(E2, boolean(), env))
+                   : addError(env, exp@location, required(req, "boolean"));
+                   
+TENV checkExp(exp:ors(EXP E1, EXP E2), TYPE req, TENV env) =                        
+  req == boolean() ? checkExp(E1, boolean(), checkExp(E2, boolean(), env))
                    : addError(env, exp@location, required(req, "boolean"));
                    
 TENV checkExp(exp:orc(EXP E1, EXP E2), TYPE req, TENV env) =                        
-  req == Boolean() ? checkExp(E1, Boolean(), checkExp(E2, Boolean(), env))
+  req == boolean() ? checkExp(E1, boolean(), checkExp(E2, boolean(), env))
                    : addError(env, exp@location, required(req, "boolean"));
                  
-//add: logical operator check for ==/!= (output type is bool); 
-//make sure both sides of exp should be in same type
+//add: logical operator check for ==/!= (output type is bool); make sure both sides of exp should be in same type
                    
 TENV checkExp(exp:coma(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Boolean()) {
-        if (checkExp(E1, String(), env) == checkExp(E2, String(), env)){
-            return checkExp(E1, String(), checkExp(E2, String(), env));
+    if (req == boolean()) {
+        if (checkExp(E1, string(), env) == checkExp(E2, string(), env)){
+            return checkExp(E1, string(), checkExp(E2, string(), env));
         }
-        else if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+        else if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
-        else if (checkExp(E1, Boolean(), env) == checkExp(E2, Boolean(), env)){
-            return checkExp(E1, Boolean(), checkExp(E2, Boolean(), env));
+        else if (checkExp(E1, boolean(), env) == checkExp(E2, boolean(), env)){
+            return checkExp(E1, boolean(), checkExp(E2, boolean(), env));
+        }
+        else if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else {
             return addError(env, exp@location, required("same type", "different types"));
@@ -119,15 +121,18 @@ TENV checkExp(exp:coma(EXP E1, EXP E2), TYPE req, TENV env) {
 }
 
 TENV checkExp(exp:comb(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Boolean()) {
-        if (checkExp(E1, String(), env) == checkExp(E2, String(), env)){
-            return checkExp(E1, String(), checkExp(E2, String(), env));
+    if (req == boolean()) {
+        if (checkExp(E1, string(), env) == checkExp(E2, string(), env)){
+            return checkExp(E1, string(), checkExp(E2, string(), env));
         }
-        else if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+        else if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
-        else if (checkExp(E1, Boolean(), env) == checkExp(E2, Boolean(), env)){
-            return checkExp(E1, Boolean(), checkExp(E2, Boolean(), env));
+        else if (checkExp(E1, boolean(), env) == checkExp(E2, boolean(), env)){
+            return checkExp(E1, boolean(), checkExp(E2, boolean(), env));
+        }
+        else if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else {
             return addError(env, exp@location, required("same type", "different types"));
@@ -140,17 +145,17 @@ TENV checkExp(exp:comb(EXP E1, EXP E2), TYPE req, TENV env) {
 
 //add: multiply/divided/add/substract (allow both int and float but type of left side and right side should be same)
 TENV checkExp(exp:mul(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Int()){
-        if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+    if (req == dec()){
+        if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
         else{
             addError(env, exp@location, required("same type int", "different types"));
         }
     }
     else if(req == float()){
-        if (checkExp(E1, Float(), env) == checkExp(E2, Float(), env)){
-            return checkExp(E1, Float(), checkExp(E2, Float(), env));
+        if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else{
             addError(env, exp@location, required("same type float", "different types"));
@@ -162,17 +167,17 @@ TENV checkExp(exp:mul(EXP E1, EXP E2), TYPE req, TENV env) {
 }      
 
 TENV checkExp(exp:div(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Int()){
-        if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+    if (req == dec()){
+        if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
         else{
             addError(env, exp@location, required("same type int", "different types"));
         }
     }
     else if(req == float()){
-        if (checkExp(E1, Float(), env) == checkExp(E2, Float(), env)){
-            return checkExp(E1, Float(), checkExp(E2, Float(), env));
+        if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else{
             addError(env, exp@location, required("same type float", "different types"));
@@ -184,17 +189,17 @@ TENV checkExp(exp:div(EXP E1, EXP E2), TYPE req, TENV env) {
 }
 
 TENV checkExp(exp:add(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Int()){
-        if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+    if (req == dec()){
+        if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
         else{
             addError(env, exp@location, required("same type int", "different types"));
         }
     }
     else if(req == float()){
-        if (checkExp(E1, Float(), env) == checkExp(E2, Float(), env)){
-            return checkExp(E1, Float(), checkExp(E2, Float(), env));
+        if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else{
             addError(env, exp@location, required("same type float", "different types"));
@@ -206,17 +211,17 @@ TENV checkExp(exp:add(EXP E1, EXP E2), TYPE req, TENV env) {
 }
 
 TENV checkExp(exp:sub(EXP E1, EXP E2), TYPE req, TENV env) {
-    if (req == Int()){
-        if (checkExp(E1, Int(), env) == checkExp(E2, Int(), env)){
-            return checkExp(E1, Int(), checkExp(E2, Int(), env));
+    if (req == dec()){
+        if (checkExp(E1, dec(), env) == checkExp(E2, dec(), env)){
+            return checkExp(E1, dec(), checkExp(E2, dec(), env));
         }
         else{
             addError(env, exp@location, required("same type int", "different types"));
         }
     }
     else if(req == float()){
-        if (checkExp(E1, Float(), env) == checkExp(E2, Float(), env)){
-            return checkExp(E1, Float(), checkExp(E2, Float(), env));
+        if (checkExp(E1, float(), env) == checkExp(E2, float(), env)){
+            return checkExp(E1, float(), checkExp(E2, float(), env));
         }
         else{
             addError(env, exp@location, required("same type float", "different types"));
@@ -226,27 +231,6 @@ TENV checkExp(exp:sub(EXP E1, EXP E2), TYPE req, TENV env) {
         return addError(env, exp@location, required(req, "int or float"));
     }
 }
-
-//TENV checkExp(exp:mul(EXP E1, EXP E2), TYPE req, TENV env) =                        
-//  req == natural() ? checkExp(E1, natural(), checkExp(E2, natural(), env))
-//                   : addError(env, exp@location, required(req, "natural"));
-  
-//TENV checkExp(exp:div(EXP E1, EXP E2), TYPE req, TENV env) =                      
-//  req == natural() ? checkExp(E1, natural(), checkExp(E2, natural(), env))
-//                   : addError(env, exp@location, required(req, "natural"));
-//
-//TENV checkExp(exp:add(EXP E1, EXP E2), TYPE req, TENV env) =                        
-//  req == natural() ? checkExp(E1, natural(), checkExp(E2, natural(), env))
-//                   : addError(env, exp@location, required(req, "natural"));
-//  
-//TENV checkExp(exp:sub(EXP E1, EXP E2), TYPE req, TENV env) =                      
-//  req == natural() ? checkExp(E1, natural(), checkExp(E2, natural(), env))
-//                   : addError(env, exp@location, required(req, "natural"));
-
-TENV checkExp(exp:conc(EXP E1, EXP E2), TYPE req, TENV env) =                    
-  req == string() ? checkExp(E1, string(), checkExp(E2, string(), env))
-                   : addError(env, exp@location, required(req, "string"));
-
 
 // check a statement
 
@@ -261,7 +245,7 @@ TENV checkStat(stat:ifElseStat(EXP Exp,
                               list[STATEMENT] Stats1,
                               list[STATEMENT] Stats2),
                TENV env){
-    env0 = checkExp(Exp, Int(), env);
+    env0 = checkExp(Exp, dec(), env);
     env1 = checkStats(Stats1, env0);
     env2 = checkStats(Stats2, env1);
     return env2;
@@ -270,7 +254,7 @@ TENV checkStat(stat:ifElseStat(EXP Exp,
 TENV checkStat(stat:whileStat(EXP Exp, 
                              list[STATEMENT] Stats1),
                  TENV env) {
-    env0 = checkExp(Exp, Int(), env);
+    env0 = checkExp(Exp, dec(), env);
     env1 = checkStats(Stats1, env0);
     return env1;
 }

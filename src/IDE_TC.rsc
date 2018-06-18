@@ -21,8 +21,7 @@ Tree parser(str x, loc l) {
     return parse(#Program, x, l);
 }
 
-//  Define connection with the JG typechecker
-// (includes type checking and uninitialized variables check)
+//  Define connection with the JG typechecker (includes type checking and uninitialized variables check)
 
 public Program checkJGProgram(Program x) {
 	p = implode(#PROGRAM, x);
