@@ -12,22 +12,14 @@ alias Instrs = list[Instr];
 
 str compileExp(natCon(int N)) = "<N>";  
 
-str compileExp(strCon(str S)) = S;
+str compileExp(strCon(str S)) = S.name;
 
-str compileExp(id(JGId Id)) = "<Id>";
+str compileExp(id(JGId Id)) = "<Id<id>>";
 
 public Instrs compileExp(add(EXP E1, EXP E2)) =    
   [*compileExp(E1), *compileExp(E2), add2()];
 
   
-// Unique label generation
-
-private int nLabel = 0;                            
-
-private str nextLabel() {
-  nLabel += 1;
-  return "L<nLabel>";
-}
 
 // Compile a statement
 
@@ -38,28 +30,17 @@ str compileStat(ifElseStat(EXP Exp,
                               list[STATEMENT] Stats1,
                               list[STATEMENT] Stats2)){
   
-  elseLab = nextLabel();
-  endLab = nextLabel();  
-  return "if ("+ Exp +") {"+ Stats1+"} else{"+Stats2+"}";
+  return "if (<compileExp(Exp)>) {<compileStates(Stats1)>} else{<compileStates(Stats2)>}";
 }
 
-Instrs compileStat(whileStat(EXP Exp, 
-                             list[STATEMENT] Stats1)) {
-  entryLab = nextLabel();
-  endLab = nextLabel();
-  return [label(entryLab), 
-          *compileExp(Exp), 
-          gofalse(endLab), 
-          *compileStats(Stats1), 
-          go(entryLab), 
-          label(endLab)];
-}
 
 // Compile a list of statements
 str compileStats(list[STATEMENT] Stats1) {
 	str result = "" ;
 	  for(s<-Stats1){
-	  	result+="<s>";
+	  	result+="<s.name>";
+	  	result+= " = ";
+	  	result+="<s.exp>";
 	  };
 	  return result;
 }   
@@ -67,10 +48,18 @@ str compileStats(list[STATEMENT] Stats1) {
   
 // Compile declarations
 
-Instrs compileDecls(list[DECL] Decls) =
-  [ ((tp == dec()) ? Double (Id) : String (Id))  |       
-    decl(JGId Id, TYPE tp) <- Decls
-  ];
+str compileDecls(list[DECL] Decls) {
+str java= "";
+	
+	for(decl <- Decls){
+		java += "private "; 
+		java += "<decl.tp> ";
+		java += " ";
+		//Java += " <decl.name>";
+	}
+	return java;
+}
+
 
 // Compile a JG program
 
@@ -79,12 +68,12 @@ public str compileProgram(PROGRAM P){
   if(program(list[DECL] Decls, list[STATEMENT] Series) := P){
   return
     "public class test {
-    '  <for (x <- sort([f | f <- compileDecls(Decls)])) {>
-    '  private <x>;
+    	<compileDecls(Decls)>
+       
        public void main(){
        	<compileStats(Series)>
        }
-  <}>
+  
     '}";
   } else
     throw "Cannot happen";
